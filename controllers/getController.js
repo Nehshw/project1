@@ -1,34 +1,21 @@
-const authorModel = require("../models/authorModel.js");
-const getAuthor= async function (req,res){
-    try {
-const userId = req.params.userId
-
-if (!userId) {
-  return res.status(400).send({status:false,message:"Please provide a valid user id"})
-  
-}
-
-const user = await authorModel.findOne({_id:userId})
-
-if (!user) {
-
-  return res.status(404).send({status:false, message: "No user found according to your seearch"})
-  
-}
-
-if (user.isDeleted==true) {
-
-  return res.status(400).send({status:false, message:"user has already been deleted"});
-  
-}
-
-return res.status(200).send({status:true, message: "user details found", data:user})
-      
-    } catch (error) {
-
-        res.status(500).send({status:false,message:err.message})
-        
+const blogModel = require("../models/blogModel.js");
+const getBlog = async function (req,res) {
+  try {
+    const data = req.body;
+    if (!data.authorId) {
+      return res
+       .status(400)
+       .send({status: false,msg:"Blog Author is required feild"});
     }
-}
 
-module.exports.getAuthor = getAuthor;
+    const getAllBlog = await blogModel.find({authorId:data.authorId});
+    res
+       .status(200)
+       .send({status:true,messege: "Blog Found successfully",data: getAllBlog});
+  } catch (error) {
+    return res.status(500).send({messege:error.messege});
+
+  }
+};
+
+module.exports.getBlog = getBlog;
