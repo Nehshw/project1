@@ -1,21 +1,47 @@
 const blogModel = require("../models/blogModel.js");
-const getBlog = async function (req,res) {
-  try {
-    const data = req.body;
-    if (!data.authorId) {
-      return res
-       .status(400)
-       .send({status: false,msg:"Blog Author is required feild"});
-    }
+const getBlog = async function(req,res){
+  {
+    try {
 
-    const getAllBlog = await blogModel.find({authorId:data.authorId});
-    res
-       .status(200)
-       .send({status:true,messege: "Blog Found successfully",data: getAllBlog});
+const query = req.query;
+
+if (Object.keys(query).length==0) {
+
+const allBlogs = await blogModel.find({isPublished:true,isDeleted:false});
+
+ 
+if (allBlogs.length !=0 ) {
+
+  return res.status(200).send({status:true,data:allBlogs})
+  
+}
+
+}
+
+if (Object.keys(query).length!=0) {
+
+query.isDeleted = false; 
+query.isPublished = true;
+    const getByQuery = await blogModel.find(query)
+
+         if(getByQuery.length !=0){
+          return res.status(200).send({status:true , data:getByQuery})
+        }
+
+        if (getByQuery.length ==0){
+          return  res.status(404).send({ status: false, msg: "No blogs found by filter"});
+        }
+
+
+}
+
+    
   } catch (error) {
-    return res.status(500).send({messege:error.messege});
-
+    res.status(500).send({status:false, error:message.error})
+    
   }
+}
+
 };
 
-module.exports.getBlog = getBlog;
+module.exports.getBlog= getBlog;
